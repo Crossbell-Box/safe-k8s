@@ -36,7 +36,7 @@ spec:
             - name: NEXT_PUBLIC_CYPRESS_MNEMONIC
             - name: NEXT_PUBLIC_FORTMATIC_KEY
             - name: NEXT_PUBLIC_GATEWAY_URL_PRODUCTION
-              value: http://safe-cgw-web.crossbell.traefik.mesh:8000/cgw
+              value: https://safe.crossbell.io/cgw
             - name: NEXT_PUBLIC_INFURA_TOKEN
             - name: NEXT_PUBLIC_IS_PRODUCTION
               value: "true"
