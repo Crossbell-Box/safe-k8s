@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: safe-txs-scheduler
-  name: txs-scheduler
+  name: safe-txs-scheduler
   namespace: crossbell
 spec:
   replicas: 1
