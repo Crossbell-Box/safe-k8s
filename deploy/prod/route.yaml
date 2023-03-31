@@ -12,6 +12,8 @@ spec:
       services:
         - name: safe-cgw-web
           port: 3666
+      middlewares:
+        - name: strip-prefix-cgw
     - kind: Rule
       match: 'Host(`safe.crossbell.io`) && PathPrefix(`/cfg/`)'
       services:
@@ -27,3 +29,13 @@ spec:
       services:
         - name: safe-ui
           port: 3000
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prefix-cgw
+  namespace: crossbell
+spec:
+  stripPrefix:
+    prefixes:
+      - /cgw
