@@ -13,7 +13,7 @@ spec:
       targetPort: 8000
 ---
 apiVersion: apps/v1
-kind: Statefulset
+kind: StatefulSet
 metadata:
   labels:
     app: safe-txs-web
@@ -21,6 +21,7 @@ metadata:
   namespace: crossbell
 spec:
   replicas: 1
+  serviceName: "safe-txs-web"
   selector:
     matchLabels:
       app: safe-txs-web

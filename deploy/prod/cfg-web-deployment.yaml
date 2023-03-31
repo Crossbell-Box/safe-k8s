@@ -13,7 +13,7 @@ spec:
       targetPort: 8000
 ---
 apiVersion: apps/v1
-kind: Statefulset
+kind: StatefulSet
 metadata:
   name: safe-cfg-web
   namespace: crossbell

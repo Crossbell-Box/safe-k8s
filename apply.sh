@@ -3,8 +3,8 @@ set -x  # show command before execute
 
 apply_one() {
 	# only replace filename ends with secrets.yaml
-	if [[ $1 =~ secrets.yaml$ ]]; then
-	        envsubst < $1 > temp.yaml && mv temp.yaml $1
+	if [ $1 =~ secrets.yaml$ ]; then
+		envsubst < $1 > temp.yaml && mv temp.yaml $1
 	fi
 
         kubectl apply -f $1
