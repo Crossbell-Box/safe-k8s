@@ -23,15 +23,15 @@ apply() {
                 apply_one $filename
         done
 
-        # rollout status / annotation
-        for filename in $@; do
-                yaml_kind=$(yq '.kind' $filename)
-                if [ "$yaml_kind" = "Deployment" ]; then
-                        ns=$(yq '.metadata.namespace' $filename)
-                        name=$(yq '.metadata.name' $filename)
-                        kubectl -n $ns rollout status -w deploy.apps/$name
-                fi
-        done
+        # rollout restart
+	kubectl -n crossbell rollout restart sts/safe-cfg-web
+	kubectl -n crossbell rollout restart deploy/safe-cgw-web
+	kubectl -n crossbell rollout restart deploy/safe-txs-scheduler
+	kubectl -n crossbell rollout restart sts/safe-txs-web
+	kubectl -n crossbell rollout restart deploy/safe-txs-worker-contracts-tokens
+	kubectl -n crossbell rollout restart deploy/safe-txs-worker-indexer
+	kubectl -n crossbell rollout restart deploy/safe-txs-worker-notifications-webhooks
+	kubectl -n crossbell rollout restart deploy/safe-ui
 }
 
 apply $@
