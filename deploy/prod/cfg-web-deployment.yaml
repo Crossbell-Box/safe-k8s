@@ -34,8 +34,9 @@ spec:
           ports:
             - containerPort: 8000
           volumeMounts:
-            - mountPath: /etc/nginx/
+            - mountPath: /etc/nginx/nginx.conf
               name: nginx-cfg-web
+              subPath: nginx.conf
               readOnly: true
             - mountPath: /nginx-cfg
               name: nginx-shared-cfg
