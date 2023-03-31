@@ -1,0 +1,29 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: safe-global
+  namespace: crossbell
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: 'Host(`safe.crossbell.io`) && PathPrefix(`/cgw/`)'
+      services:
+        - name: safe-cgw-web
+          port: 3666
+    - kind: Rule
+      match: 'Host(`safe.crossbell.io`) && PathPrefix(`/cfg/`)'
+      services:
+        - name: safe-cfg-web
+          port: 8000
+    - kind: Rule
+      match: 'Host(`safe.crossbell.io`) && PathPrefix(`/txs/`)'
+      services:
+        - name: safe-txs-web
+          port: 8000
+    - kind: Rule
+      match: 'Host(`safe-ui.crossbell.io`)'
+      services:
+        - name: safe-ui
+          port: 3000

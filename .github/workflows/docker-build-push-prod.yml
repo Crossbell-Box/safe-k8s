@@ -1,0 +1,34 @@
+# build and push docker image to docker hub
+name: Build & Deploy Prod
+
+on:
+  push:
+    branches:
+      - "main"
+
+env:
+  REGION_ID: us-east-1
+  ACK_CLUSTER_ID: cfc647c22fd6848b5a602ad4d7470632b
+
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    environment: Production
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set K8s context
+        uses: aliyun/ack-set-context@v1
+        with:
+          access-key-id: "${{ secrets.ACCESS_KEY_ID }}"
+          access-key-secret: "${{ secrets.ACCESS_KEY_SECRET }}"
+          cluster-id: "${{ env.ACK_CLUSTER_ID }}"
+      - run: |
+          wget https://github.com/mikefarah/yq/releases/download/v4.25.1/yq_linux_amd64.tar.gz -O - | tar xz && mv yq_linux_amd64 /usr/local/bin/yq
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.10/bin/linux/amd64/kubectl && chmod +x kubectl && mv kubectl /usr/local/bin/kubectl
+      - uses: sljeff/secrets2env@main
+        with:
+          secrets-json: ${{ toJson(secrets) }}
+      - run: |
+          sh apply.sh deploy/prod/*

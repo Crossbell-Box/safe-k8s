@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: safe-txs-scheduler
+  name: txs-scheduler
+  namespace: crossbell
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: safe-txs-scheduler
+  template:
+    metadata:
+      labels:
+        app: safe-txs-scheduler
+    spec:
+      containers:
+        - args:
+            - docker/web/celery/scheduler/run.sh
+          envFrom:
+            - secretRef:
+                name: safe-txs
+          env:
+            - name: RUN_MIGRATIONS
+              value: "1"
+            - name: WORKER_QUEUES
+              value: default,indexing
+          image: safeglobal/safe-transaction-service:latest
+          name: txs-scheduler
+          resources: {}
+      restartPolicy: Always

@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: safe-cfg-web
+  namespace: crossbell
+spec:
+  selector:
+    app: safe-cfg-web
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Statefulset
+metadata:
+  name: safe-cfg-web
+  namespace: crossbell
+spec:
+  replicas: 1
+  serviceName: "safe-cfg-web"
+  selector:
+    matchLabels:
+      app: safe-cfg-web
+  template:
+    metadata:
+      labels:
+        app: safe-cfg-web
+    spec:
+      containers:
+        - image: nginx:alpine
+          name: cfg-web
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-cfg-web
+              readOnly: true
+            - mountPath: /nginx-cfg
+              name: nginx-shared-cfg
+        - image: safeglobal/safe-config-service:latest
+          envFrom:
+            - secretRef:
+                name: safe-cfg
+          name: cfg-web
+          resources:
+            requests:
+              memory: "1000Mi"
+              cpu: "200m"
+            limits:
+              memory: "4000Mi"
+              cpu: "1000m"
+          volumeMounts:
+            - mountPath: /nginx
+              name: nginx-shared-cfg
+      restartPolicy: Always
+      volumes:
+        - name: nginx-cfg-web
+          configMap:
+            name: nginx-cfg-web
+  volumeClaimTemplates:
+    - metadata:
+        name: nginx-shared-cfg
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "alicloud-disk-ssd"
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-cfg-web
+  namespace: crossbell
+data:
+  nginx.conf: |
+    worker_processes 1;
+
+    events {
+      worker_connections 2000; # increase if you have lots of clients
+      accept_mutex off; # set to 'on' if nginx worker_processes > 1
+      use epoll; # Enable epoll for Linux 2.6+
+    }
+
+    http {
+        include mime.types;
+        default_type application/octet-stream;
+        sendfile on;
+    
+        upstream cfg_app_server {
+          ip_hash;  # For load-balancing
+          server unix:/nginx-cfg/gunicorn.socket fail_timeout=0;
+          keepalive 32;
+        }
+
+        server {
+            access_log off;
+            listen 8000 deferred;
+            charset utf-8;
+            keepalive_timeout 75s;
+
+            gzip             on;
+            gzip_min_length 1000;
+            gzip_comp_level  2;
+            gzip_types text/plain text/css application/json application/javascript application/x-javascript text/javascript text/xml application/xml application/rss+xml application/atom+xml application/rdf+xml;
+            gzip_disable "MSIE [1-6]\.";
+
+            location /cfg/static {
+                alias /nginx-cfg/staticfiles;
+                expires 365d;
+            }
+
+            location /cfg/ {
+                proxy_pass http://cfg_app_server/;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarded-Host $server_name;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header        X-Forwarded-Proto $http_x_forwarded_proto;
+                add_header              Front-End-Https   on;
+                # we don't want nginx trying to do something clever with
+                # redirects, we set the Host: header above already.
+                proxy_redirect off;
+                # They default to 60s. Increase to avoid WORKER TIMEOUT in web container
+                proxy_connect_timeout 60s;
+                proxy_read_timeout 60s;
+            }
+        }
+    }
