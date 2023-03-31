@@ -33,7 +33,7 @@ spec:
         - image: safeglobal/safe-client-gateway:latest
           envFrom:
             - secretRef:
-                name: safe-txs
+                name: safe-cgw
           ports:
             - containerPort: 3666
           name: cgw-web
