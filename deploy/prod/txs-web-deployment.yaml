@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - image: nginx:alpine
-          name: cfg-web
+          name: txs-web-nginx
           ports:
             - containerPort: 8000
           volumeMounts:
