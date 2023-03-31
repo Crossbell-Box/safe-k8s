@@ -45,13 +45,6 @@ spec:
             - secretRef:
                 name: safe-cfg
           name: cfg-web
-          resources:
-            requests:
-              memory: "1000Mi"
-              cpu: "200m"
-            limits:
-              memory: "4000Mi"
-              cpu: "1000m"
           volumeMounts:
             - mountPath: /nginx
               name: nginx-shared-cfg
