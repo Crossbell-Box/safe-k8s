@@ -1,11 +1,19 @@
+#!/usr/bin/env sh
+
 set -e  # exit on error
 set -x  # show command before execute
 
 apply_one() {
 	# only replace filename ends with secrets.yaml
-	if [[ $1 == *"secrets.yaml" ]]; then
-		envsubst < $1 > temp.yaml && mv temp.yaml $1
-	fi
+	case "$1" in
+	  *secrets.yaml)
+	    envsubst < $1 > temp.yaml && mv temp.yaml $1
+	    ;;
+	  *)
+	    echo "The filename does not end with secrets.yaml"
+	    ;;
+	esac
+
 
         kubectl apply -f $1
 }
