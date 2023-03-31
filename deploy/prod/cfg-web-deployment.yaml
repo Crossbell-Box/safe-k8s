@@ -64,7 +64,7 @@ spec:
         name: nginx-shared-cfg
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "alicloud-disk-ssd"
+        storageClassName: "alicloud-disk-essd"
         resources:
           requests:
             storage: 20Gi
