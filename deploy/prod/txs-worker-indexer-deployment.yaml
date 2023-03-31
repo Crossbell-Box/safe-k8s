@@ -9,7 +9,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: app-txs-worker-indexer
+      app: safe-txs-worker-indexer
   template:
     metadata:
       labels:
@@ -28,5 +28,11 @@ spec:
               value: default,indexing
           image: safeglobal/safe-transaction-service:latest
           name: txs-worker-indexer
-          resources: {}
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "4000Mi"
+            limits:
+              cpu: "2000m"
+              memory: "8000Mi"
       restartPolicy: Always
