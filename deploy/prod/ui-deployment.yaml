@@ -39,7 +39,7 @@ spec:
               value: https://safe.crossbell.io/cgw
             - name: NEXT_PUBLIC_INFURA_TOKEN
             - name: NEXT_PUBLIC_IS_PRODUCTION
-              value: "true"
+              value: "false"
             - name: NEXT_PUBLIC_PORTIS_KEY
             - name: NEXT_PUBLIC_SAFE_APPS_INFURA_TOKEN
             - name: NEXT_PUBLIC_SAFE_VERSION
