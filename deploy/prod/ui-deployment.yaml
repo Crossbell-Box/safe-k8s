@@ -49,7 +49,7 @@ spec:
             - name: NEXT_PUBLIC_TENDERLY_PROJECT_NAME
             - name: NEXT_PUBLIC_TENDERLY_SIMULATE_ENDPOINT_URL
             - name: NEXT_PUBLIC_WC_BRIDGE
-          image: safeglobal/web-core:latest
+          image: safeglobal/web-core:dev
           name: ui
           ports:
             - containerPort: 3000
