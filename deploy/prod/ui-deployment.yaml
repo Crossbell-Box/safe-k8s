@@ -39,7 +39,7 @@ spec:
               value: https://safe.crossbell.io/cgw
             - name: NEXT_PUBLIC_INFURA_TOKEN
             - name: NEXT_PUBLIC_IS_PRODUCTION
-              value: "true"
+              value: "false"
             - name: NEXT_PUBLIC_PORTIS_KEY
             - name: NEXT_PUBLIC_SAFE_APPS_INFURA_TOKEN
             - name: NEXT_PUBLIC_SAFE_VERSION
@@ -49,7 +49,7 @@ spec:
             - name: NEXT_PUBLIC_TENDERLY_PROJECT_NAME
             - name: NEXT_PUBLIC_TENDERLY_SIMULATE_ENDPOINT_URL
             - name: NEXT_PUBLIC_WC_BRIDGE
-          image: iavlx/web-core:dev
+          image: iavlx/web-core:dev2
           name: ui
           ports:
             - containerPort: 3000
