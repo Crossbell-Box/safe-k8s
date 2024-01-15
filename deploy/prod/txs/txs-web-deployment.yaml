@@ -30,6 +30,16 @@ spec:
       labels:
         app: safe-txs-web
     spec:
+      initContainers:
+        - name: chmod
+          image: alpine
+          volumeMounts:
+            - mountPath: /nginx
+              name: nginx-txs-web
+          command:
+            - "/bin/sh"
+            - "-c"
+            - "chmod -R 777 /nginx"
       containers:
         - image: nginx:alpine
           name: txs-web-nginx
