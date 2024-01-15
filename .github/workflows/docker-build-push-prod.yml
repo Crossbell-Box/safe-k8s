@@ -15,7 +15,7 @@ jobs:
     uses: NaturalSelectionLabs/Daedalus/.github/workflows/deploy-v3-tpl.yaml@main
     with:
       images: safe
-      tag: ""
+      tag: latest
       cluster: prod
       namespace: crossbell
       releaseName: safe
