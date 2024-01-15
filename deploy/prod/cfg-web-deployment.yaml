@@ -35,7 +35,9 @@ spec:
             - mountPath: /nginx
               name: nginx-shared-cfg
           command:
-            - chmod -R 777 /nginx
+            - "/bin/sh"
+            - "-c"
+            - "chmod -R 777 /nginx"
       containers:
         - image: nginx:alpine
           name: cfg-web-nginx
