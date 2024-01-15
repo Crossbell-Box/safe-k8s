@@ -54,11 +54,13 @@ spec:
           configMap:
             name: nginx-cfg-web
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: nginx-shared-cfg
       spec:
         accessModes: ["ReadWriteOnce"]
-        storageClassName: "alicloud-disk-essd"
+        storageClassName: "standard"
         resources:
           requests:
             storage: 20Gi
