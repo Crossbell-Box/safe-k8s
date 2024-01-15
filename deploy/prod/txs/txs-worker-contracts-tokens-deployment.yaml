@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: safe-txs-worker-contracts-tokens
+  name: safe-txs-worker-contracts-tokens
+  namespace: crossbell
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: safe-txs-worker-contracts-tokens
+  template:
+    metadata:
+      labels:
+        app: safe-txs-worker-contracts-tokens
+    spec:
+      containers:
+        - args:
+            - docker/web/celery/worker/run.sh
+          envFrom:
+            - secretRef:
+                name: safe-txs
+          env:
+            - name: WORKER_QUEUES
+              value: contracts,tokens
+          image: safeglobal/safe-transaction-service:latest
+          name: txs-worker-contracts-tokens
+          resources: {}
+      restartPolicy: Always

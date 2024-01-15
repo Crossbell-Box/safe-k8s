@@ -1,0 +1,130 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: safe-txs-web
+  namespace: crossbell
+spec:
+  selector:
+    app: safe-txs-web
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: safe-txs-web
+  name: safe-txs-web
+  namespace: crossbell
+spec:
+  replicas: 1
+  serviceName: "safe-txs-web"
+  selector:
+    matchLabels:
+      app: safe-txs-web
+  template:
+    metadata:
+      labels:
+        app: safe-txs-web
+    spec:
+      containers:
+        - image: nginx:alpine
+          name: txs-web-nginx
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-txs-web
+              subPath: nginx.conf
+              readOnly: true
+            - mountPath: /nginx-txs
+              name: nginx-shared-txs
+        - args:
+            - docker/web/run_web.sh
+          envFrom:
+            - secretRef:
+                name: safe-txs
+          image: safeglobal/safe-transaction-service:latest
+          name: txs-web
+          resources: {}
+          volumeMounts:
+            - mountPath: /nginx
+              name: nginx-shared-txs
+          workingDir: /app
+      restartPolicy: Always
+      volumes:
+        - name: nginx-txs-web
+          configMap:
+            name: nginx-txs-web
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: nginx-shared-txs
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-txs-web
+  namespace: crossbell
+data:
+  nginx.conf: |
+    worker_processes 1;
+
+    events {
+      worker_connections 2000; # increase if you have lots of clients
+      accept_mutex off; # set to 'on' if nginx worker_processes > 1
+      use epoll; # Enable epoll for Linux 2.6+
+    }
+
+    http {
+        include mime.types;
+        default_type application/octet-stream;
+        sendfile on;
+
+        upstream txs_app_server {
+          server unix:/nginx-txs/gunicorn.socket fail_timeout=0;
+          keepalive 32;
+        }
+
+       server {
+            access_log off;
+            listen 8000 deferred;
+            charset utf-8;
+            keepalive_timeout 75s;
+
+            gzip             on;
+            gzip_min_length 1000;
+            gzip_comp_level  2;
+            gzip_types text/plain text/css application/json application/javascript application/x-javascript text/javascript text/xml application/xml application/rss+xml application/atom+xml application/rdf+xml;
+            gzip_disable "MSIE [1-6]\.";
+
+            location /txs/static {
+                alias /nginx-txs/staticfiles;
+                expires 365d;
+            }
+
+            location /txs/ {
+                proxy_set_header    X-Forwarded-For     $proxy_add_x_forwarded_for;
+                proxy_set_header    X-Forwarded-Proto   $scheme;
+                proxy_set_header    Host                $host;
+                # we don't want nginx trying to do something clever with
+                # redirects, we set the Host: header above already.
+                proxy_redirect off;
+                proxy_pass http://txs_app_server/;
+
+                proxy_set_header X-Forwarded-Host $server_name;
+                proxy_set_header X-Real-IP $remote_addr;
+                add_header              Front-End-Https   on;
+            }
+        }
+    }

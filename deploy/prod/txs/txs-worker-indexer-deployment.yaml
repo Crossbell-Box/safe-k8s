@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: safe-txs-worker-indexer
+  name: safe-txs-worker-indexer
+  namespace: crossbell
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: safe-txs-worker-indexer
+  template:
+    metadata:
+      labels:
+        app: safe-txs-worker-indexer
+    spec:
+      containers:
+        - args:
+            - docker/web/celery/worker/run.sh
+          envFrom:
+            - secretRef:
+                name: safe-txs
+          env:
+            - name: RUN_MIGRATIONS
+              value: "1"
+            - name: WORKER_QUEUES
+              value: default,indexing
+          image: safeglobal/safe-transaction-service:latest
+          name: txs-worker-indexer
+          resources:
+            requests:
+              cpu: "1000m"
+              memory: "4000Mi"
+            limits:
+              cpu: "2000m"
+              memory: "8000Mi"
+      restartPolicy: Always

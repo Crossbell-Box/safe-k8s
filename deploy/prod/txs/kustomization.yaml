@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - txs-scheduler-deployment.yaml
+  - txs-web-deployment.yaml
+  - txs-worker-contracts-tokens-deployment.yaml
+  - txs-worker-indexer-deployment.yaml
+  - txs-worker-notifications-webhooks-deployment.yaml
