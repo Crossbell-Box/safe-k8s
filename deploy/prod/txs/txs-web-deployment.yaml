@@ -35,7 +35,7 @@ spec:
           image: alpine
           volumeMounts:
             - mountPath: /nginx
-              name: nginx-txs-web
+              name: nginx-shared-txs
           command:
             - "/bin/sh"
             - "-c"
