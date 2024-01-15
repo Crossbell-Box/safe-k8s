@@ -7,3 +7,4 @@ resources:
   - cgw-web-deployment.yaml
   - ui-deployment.yaml
   - secret
+  - route.yaml
