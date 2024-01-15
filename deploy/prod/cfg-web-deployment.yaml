@@ -28,6 +28,14 @@ spec:
       labels:
         app: safe-cfg-web
     spec:
+      initContainers:
+        - name: chmod
+          image: alpine
+          volumeMounts:
+            - mountPath: /nginx
+              name: nginx-shared-cfg
+          command:
+            - chmod -R 777 /nginx
       containers:
         - image: nginx:alpine
           name: cfg-web-nginx
