@@ -39,9 +39,9 @@ spec:
           name: cgw-web
           resources:
             requests:
-              memory: "1000Mi"
-              cpu: "200m"
+              memory: "128Mi"
+              cpu: "0.1"
             limits:
-              memory: "4000Mi"
-              cpu: "1000m"
+              memory: "1Gi"
+              cpu: "0.5"
       restartPolicy: Always
